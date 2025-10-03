@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useData } from "../../contexts/DataContext";
-import { getMonth } from "../../helpers/Date";
 import "./style.scss";
 
 const Slider = () => {

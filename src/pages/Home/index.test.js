@@ -33,10 +33,14 @@ describe("When a page is created", () => {
     // to implement
   })
   it("a list a people is displayed", () => {
-    // to implement
+    render(<Home />);
+    expect(screen.getByText("Samira")).toBeInTheDocument();
+    expect(screen.getByText("Jean-baptiste")).toBeInTheDocument();
+    expect(screen.getByText("Alice")).toBeInTheDocument();
   })
   it("a footer is displayed", () => {
-    // to implement
+    render(<Home />);
+    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   })
   it("an event card, with the last event, is displayed", () => {
     // to implement
