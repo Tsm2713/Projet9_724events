@@ -16,7 +16,6 @@ import { useData } from "../../contexts/DataContext";
 const Page = () => {
   const { data } = useData();
 
-  // Dernier évènement (par date décroissante)
   const last = useMemo(() => {
     const events = Array.isArray(data?.events) ? data.events : [];
     if (!events.length) return null;

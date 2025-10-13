@@ -6,7 +6,6 @@ const Slider = () => {
   const { data } = useData();
   const [index, setIndex] = useState(0);
 
-  // Tri par date décroissante + on garde 3 items
   const items = useMemo(() => {
     const focus = Array.isArray(data?.focus) ? data.focus : [];
     return focus
@@ -15,14 +14,12 @@ const Slider = () => {
       .slice(0, 3);
   }, [data]);
 
-  // Si la liste change et que l'index dépasse, on reset
   useEffect(() => {
     if (index >= items.length && items.length > 0) {
       setIndex(0);
     }
   }, [index, items.length]);
 
-  // Auto-play toutes les 5s (cleanup systématique)
   useEffect(() => {
     if (!items.length) {
       return () => {};

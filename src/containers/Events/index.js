@@ -1,53 +1,33 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import EventCard from "../../components/EventCard";
 import Select from "../../components/Select";
 import { useData } from "../../contexts/DataContext";
 import Modal from "../Modal";
 import ModalEvent from "../ModalEvent";
-
 import "./style.css";
 
 const PER_PAGE = 9;
 
 const EventList = () => {
   const { data, error } = useData();
-  const [type, setType] = useState(); // undefined = Toutes
+  const [type, setType] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const events = Array.isArray(data?.events) ? data.events : [];
+  const eventsAll = data?.events || [];
+  const typeList = Array.from(new Set(eventsAll.map((event) => event.type)));
 
-  // Liste des catégories disponibles
-  const typeList = useMemo(
-    () => Array.from(new Set(events.map((e) => e.type))),
-    [events]
-  );
+  const eventsByType = type ? eventsAll.filter((event) => event.type === type) : eventsAll;
+  const eventsSorted = [...eventsByType].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Filtrage dynamique (sans muter la source)
-  const filteredEvents = useMemo(
-    () =>
-      !type
-        ? events
-        : events.filter(
-            (e) =>
-              String(e.type).toLowerCase() === String(type).toLowerCase()
-          ),
-    [events, type]
-  );
+  const startIndex = (currentPage - 1) * PER_PAGE;
+  const paginatedEvents = eventsSorted.slice(startIndex, startIndex + PER_PAGE);
 
-  // Pagination
-  const pageCount = Math.max(1, Math.ceil(filteredEvents.length / PER_PAGE));
-  const start = (currentPage - 1) * PER_PAGE;
-  const pageItems = filteredEvents.slice(start, start + PER_PAGE);
+  const pageNumber = Math.ceil(eventsByType.length / PER_PAGE);
+  const pages = Array.from({ length: pageNumber }, (_, i) => i + 1);
 
-  // Pages (sans index comme key)
-  const pages = useMemo(
-    () => Array.from({ length: pageCount }, (_, i) => i + 1),
-    [pageCount]
-  );
-
-  const handleSelect = (evtType) => {
+  const changeType = (evtType) => {
     setCurrentPage(1);
-    setType(evtType || undefined);
+    setType(evtType);
   };
 
   return (
@@ -60,36 +40,27 @@ const EventList = () => {
           <h3 className="SelectTitle">Catégories</h3>
           <Select
             selection={typeList}
-            onChange={handleSelect}
-            name="event-type"
-            label="Catégories"
+            onChange={(value) => (value ? changeType(value) : changeType(null))}
           />
-
-          {/* ⬇️ Conteneur avec la bonne classe pour 3 cartes par ligne */}
           <div id="events" className="ListContainer">
-            {pageItems.map((event) => (
-              <Modal
-                key={event.id ?? event.title}
-                Content={<ModalEvent event={event} />}
-              >
+            {paginatedEvents.map((event) => (
+              <Modal key={event.id} Content={<ModalEvent event={event} />}>
                 {({ setIsOpened }) => (
                   <EventCard
-                    imageSrc={event.cover}
-                    imageAlt={event.title}
-                    date={new Date(event.date)}
-                    title={event.title}
-                    label={event.type}
                     onClick={() => setIsOpened(true)}
+                    imageSrc={event.cover}
+                    title={event.title}
+                    date={new Date(event.date)}
+                    label={event.type}
                   />
                 )}
               </Modal>
             ))}
           </div>
-
           <div className="Pagination">
-            {pages.map((p) => (
-              <a key={`page-${p}`} href="#events" onClick={() => setCurrentPage(p)}>
-                {p}
+            {pages.map((page) => (
+              <a key={`page-${page}`} href="#events" onClick={() => setCurrentPage(page)}>
+                {page}
               </a>
             ))}
           </div>
