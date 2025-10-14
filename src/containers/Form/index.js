@@ -1,3 +1,4 @@
+/* eslint react/require-default-props: 0 */
 import { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import Field, { FIELD_TYPES } from "../../components/Field";
@@ -8,18 +9,17 @@ const mockContactApi = () => new Promise((resolve) => {
   setTimeout(resolve, 500);
 });
 
-const Form = ({ onSuccess, onError }) => {
+const Form = ({ onSuccess = () => null, onError = () => null }) => {
   const [sending, setSending] = useState(false);
 
   const sendContact = useCallback(
     async (evt) => {
       evt.preventDefault();
       setSending(true);
-      // We try to call mockContactApi
       try {
         await mockContactApi();
         setSending(false);
-        onSuccess();  // Appel de la fonction de succès une fois l'envoi terminé
+        onSuccess();
       } catch (err) {
         setSending(false);
         onError(err);
@@ -61,11 +61,6 @@ const Form = ({ onSuccess, onError }) => {
 Form.propTypes = {
   onError: PropTypes.func,
   onSuccess: PropTypes.func,
-};
-
-Form.defaultProps = {
-  onError: () => null,
-  onSuccess: () => null,
 };
 
 export default Form;

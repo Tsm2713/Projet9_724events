@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint react/require-default-props: 0 */
 import { useState } from "react";
 import PropTypes from "prop-types";
 
@@ -7,19 +8,21 @@ import "./style.scss";
 
 const Select = ({
   selection,
-  onChange,
-  name,
-  titleEmpty,
-  label,
+  onChange = () => null,
+  name = "select",
+  titleEmpty = false,
+  label = "",
   type = "normal",
 }) => {
   const [value, setValue] = useState();
   const [collapsed, setCollapsed] = useState(true);
+
   const changeValue = (newValue) => {
     setValue(newValue);
     if (typeof onChange === "function") onChange(newValue);
     setCollapsed(true);
   };
+
   return (
     <div className={`SelectContainer ${type}`} data-testid="select-testid">
       {label && <div className="label">{label}</div>}
@@ -88,14 +91,6 @@ Select.propTypes = {
   titleEmpty: PropTypes.bool,
   label: PropTypes.string,
   type: PropTypes.string,
-}
-
-Select.defaultProps = {
-  onChange: () => null,
-  titleEmpty: false,
-  label: "",
-  type: "normal",
-  name: "select",
-}
+};
 
 export default Select;
